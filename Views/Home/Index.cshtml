@@ -1,0 +1,26 @@
+﻿
+@{
+    Layout = null;
+}
+
+<html>
+
+<head>
+    <script src="~/lib/jquery/jquery.js"></script>
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+
+    <script type="text/javascript">
+        var hub = new signalR.HubConnectionBuilder().withUrl("https://192.168.178.51:45458/hub").build();
+        hub.start()
+            .then(function () {
+                console.log("Connected...")
+                hub.invoke('JoinAsync', 'aaa')
+                    .then(() => console.log('ok'))
+                    .catch(err => console.log(err.toString()));
+            })
+            .catch(err => console.log(err.toString()));
+    </script>
+</head>
+
+
+</html>
