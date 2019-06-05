@@ -5,19 +5,19 @@ namespace SignalRDemo
 {
     public class SignalRHub : Hub
     {
-        public async Task Join(string whateverId)
+        public async Task Join(string timestamp)
         {
-            await this.Groups.AddToGroupAsync(this.Context.ConnectionId, whateverId);
+            await this.Groups.AddToGroupAsync(this.Context.ConnectionId, timestamp);
 
-            await SendMessage(whateverId);
+            await SendMessage(this.Context.ConnectionId, timestamp);
         }
 
-        public async Task SendMessage(string whateverId)
+        public async Task SendMessage(string connectionId, string timestamp)
         {
             // Wait a second
-            await Task.Delay(1000);
+            //await Task.Delay(1000);
 
-            await this.Clients.Group(whateverId).SendAsync("ConfirmConnection", arg1: whateverId);
+            await this.Clients.Group(timestamp).SendAsync("confirmJoin", arg1: connectionId, arg2: timestamp);
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System;
 
 namespace SignalRDemo
 {
@@ -16,32 +17,33 @@ namespace SignalRDemo
         {
             services.AddMvc();
 
+            //
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowSpecificOrigin",
+            //        builder => builder.WithOrigins("http://localhost:4200", "http://localhost:4300")
+            //            .AllowAnyMethod()
+            //            .AllowAnyHeader()
+            //            .AllowCredentials());
+            //});
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins("http://localhost:4200", "http://localhost:4300")
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials());
-            });
-            services.Configure<JsonHubProtocolOptions>(options =>
-            {
-                options.PayloadSerializerSettings = new JsonSerializerSettings
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                };
-            });
-            services.Configure<MvcOptions>(options =>
-            {
-                options.Filters.Add(new CorsAuthorizationFilterFactory("AllowSpecificOrigin"));
-            });
-
+            //services.Configure<JsonHubProtocolOptions>(options =>
+            //{
+            //    options.PayloadSerializerSettings = new JsonSerializerSettings
+            //    {
+            //        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            //    };
+            //});
+            //services.Configure<MvcOptions>(options =>
+            //{
+            //    options.Filters.Add(new CorsAuthorizationFilterFactory("AllowSpecificOrigin"));
+            //});
+            //
 
             services.AddSignalR(hubOptions =>
             {
                 hubOptions.EnableDetailedErrors = true;
-                //   hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(3);
+                hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(3);
             });
         }
 
@@ -51,12 +53,13 @@ namespace SignalRDemo
             {
                 app.UseDeveloperExceptionPage();
             }
-            //else
-            //{
-            //    app.UseHsts();
-            //}
+            else
+            {
+                app.UseHsts();
+            }
 
-            app.UseCors("AllowSpecificOrigin");
+            app.UseCors("AllowAnyOrigin");
+
             app.UseSignalR(route =>
             {
                 var desiredTransports =
@@ -66,14 +69,13 @@ namespace SignalRDemo
                     options.Transports = desiredTransports;
                 });
             });
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                    template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            app.UseCors("AllowSpecificOrigin");            
         }
     }
 }
